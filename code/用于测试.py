@@ -1,0 +1,30 @@
+import pandas as pd
+import numpy as np
+
+#data = pd.DataFrame({"A":[i for i in range(3,6)],"B":[100,200,300],"small":[0.35,0.61,1.32]})
+
+#print(data)
+
+#data2 = data.sample(frac=5/3,replace=True,random_state=1) 
+
+#print(data2)
+
+from pyecharts import options as opts
+from pyecharts.charts import Boxplot
+
+senti_data = pd.read_csv("data_storage\\cleansed_data\\senti_count.csv")
+nega = list(senti_data["negative_prob"])
+posi = list(senti_data["positive_prob"])
+
+nega = np.array(nega)*10
+posi = np.array(posi)*10
+
+
+
+#print(senti_data.head(6))
+c = Boxplot()
+c.add_xaxis(["probability"])
+c.add_yaxis("negative", c.prepare_data([list(nega)]))
+c.add_yaxis("positive", c.prepare_data([list(posi)]))
+c.set_global_opts(yaxis_opts=opts.AxisOpts(),xaxis_opts=opts.AxisOpts(is_show=False),title_opts=opts.TitleOpts(title="情感判断分布箱线图",pos_top="3%",pos_left="45%"),legend_opts=opts.LegendOpts(pos_bottom="3%",pos_left="35%"))
+c.render("2sentiment_distribution_boxplot.html")

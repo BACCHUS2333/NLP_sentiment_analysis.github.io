@@ -1,0 +1,149 @@
+#Dedicated to my dear fellow Jade,
+#2023/5/27 at WH hotel
+
+
+#to web-crawl hotsearch from Weibo at a fixed frequency
+#and store them in a new folder named "data_storage" in
+#the form of csv
+
+
+import pandas as pd
+import requests
+import time
+from datetime import datetime
+headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36',
+           }
+
+
+import os
+ 
+def mkdir(path):
+ 
+	folder = os.path.exists(path)
+ 
+	if not folder:                   #判断是否存在文件夹如果不存在则创建为文件夹
+		os.makedirs(path)            #makedirs 创建文件时如果路径不存在会创建这个路径
+		print("---  new folder...  ---")
+		print("---  OK  ---")
+ 
+	else:
+		print("---  There is this folder!  ---")
+		
+file = "E:\\python当学会\\课程作业\\homework_04_finale\\Finale\\data_storage"
+file_path = "data_storage" #create a new folder named "data_storage"
+mkdir(file_path)  
+
+
+def crawler_weibo(n):
+    while True:
+        lst = []
+        try:
+            try:
+                url1 = 'https://weibo.com/ajax/side/hotSearch'
+                html1 = requests.get(url=url1,headers=headers)
+                sj_lst1 = html1.json()['data']['realtime']
+                for i in sj_lst1:
+                    try:
+                        data={}
+                        data['主类'] = '热搜榜'
+                        data['类别'] = i['category']
+                        data['标题'] = i['note']
+                        data['排名'] = i['rank']+1
+                        data['热度'] = i['num'] 
+                        try:
+                            dt = datetime.fromtimestamp(i['start_time'])
+                            s = dt.strftime("%Y-%m-%d %H:%M:%S")
+                            data['上榜时间'] = s
+                            data['链接'] = 'https://s.weibo.com/weibo?q=#{}#'.format(i['note'])
+                        except:
+                            try:
+                                dt = datetime.fromtimestamp(i['onboard_time'])
+                                s = dt.strftime("%Y-%m-%d %H:%M:%S")
+                                data['上榜时间'] = s
+                                data['链接'] = 'https://s.weibo.com/weibo?q=#{}#'.format(i['note'])
+                            except:
+                                pass
+                        lst.append(data)
+                    except:
+                        pass
+            except:
+                print("hotsearch fail")
+                pass
+            try:
+                url2 = 'https://weibo.com/ajax/statuses/entertainment'
+                html2 = requests.get(url=url2,headers=headers)
+                sj_lst2 = html2.json()['data']['band_list']
+                for i in sj_lst2:
+                    try:
+                        data={}
+                        data['主类'] = '文娱榜'
+                        data['类别'] = i['category']
+                        data['标题'] = i['note']
+                        data['排名'] = i['hot_rank_position']
+                        data['热度'] = i['num']
+                        try:
+                            dt = datetime.fromtimestamp(i['start_time'])
+                            s = dt.strftime("%Y-%m-%d %H:%M:%S")
+                            data['上榜时间'] = s
+                            data['链接'] = 'https://s.weibo.com/weibo?q=#{}#'.format(i['note'])
+                        except:
+                            try:
+                                dt = datetime.fromtimestamp(i['onboard_time'])
+                                s = dt.strftime("%Y-%m-%d %H:%M:%S")
+                                data['上榜时间'] = s
+                                data['链接'] = 'https://s.weibo.com/weibo?q=#{}#'.format(i['note'])
+                            except:
+                                pass
+                        lst.append(data)
+                    except:
+                        pass
+            except:
+                print("entertainment fail")
+                pass
+            try:    
+                url3 = 'https://weibo.com/ajax/statuses/news'
+                html3 = requests.get(url=url3,headers=headers)
+                sj_lst3 = html3.json()['data']['band_list']
+                for i in sj_lst3:
+                    try:
+                        data={}
+                        data['主类'] = '要闻榜'
+                        data['类别'] = i['category']
+                        data['标题'] = i['topic']
+                        data['排名'] = i['rank']
+                        #data['热度'] = i['num']
+                        data['链接'] = 'https://s.weibo.com/weibo?q=#{}#'.format(i['topic'])
+                        try:
+                            dt = datetime.fromtimestamp(i['start_time'])
+                            s = dt.strftime("%Y-%m-%d %H:%M:%S")
+                            data['上榜时间'] = s
+                        except:
+                            try:
+                                dt = datetime.fromtimestamp(i['onboard_time'])
+                                s = dt.strftime("%Y-%m-%d %H:%M:%S")
+                                data['上榜时间'] = s
+                            except:
+                                pass
+                        print(data)
+                        lst.append(data)
+                    except:
+                        pass
+                
+            except:
+                print("news fail")
+                pass
+            result = pd.DataFrame(lst)
+            now_time = time.time()
+            dt = datetime.fromtimestamp(now_time)
+            s = dt.strftime("%Y-%m-%d %H:%M:%S")
+            s2 = dt.strftime("%Y_%m_%d_%H_%M_%S")
+            result['爬取时间'] = s
+            result.to_excel(file+str("\\")+s2+'.xlsx',index=None)
+            time.sleep(n) # 睡眠n秒，以便整个页面加载。。。。。。。。。。。。。。。。
+            print(s2,'热搜抓取完毕')
+        except:
+            print("fail to enter")
+            time.sleep(n) #    睡眠n秒，以便整个页面加载。。。。。。。。。。。。。。。。。。。
+
+crawler_weibo(3600) #定义爬取的间隔时间
+

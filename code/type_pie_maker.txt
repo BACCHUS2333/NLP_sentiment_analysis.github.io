@@ -1,0 +1,21 @@
+import pandas as pd
+import numpy as np
+
+data = pd.read_csv("data_storage\\cleansed_data\\sort_by_type.csv",encoding='gbk')
+d = []
+for i in range(len(data.index)):
+    d.append([data.iloc[i,0],int(data.iloc[i,1])])
+
+print(d) #.to_numpy()将DataFrame转换为Num
+from pyecharts.charts import Page,Pie
+from pyecharts import options as opts
+from pyecharts.faker import Faker
+#from pyecharts.options import options as opts
+c = (
+    Pie()
+    .add("",d,radius=[70,120])
+    .set_global_opts(title_opts=opts.TitleOpts(title="热榜按类别分类饼状图",pos_left="40%",pos_top="5%"),legend_opts=opts.LegendOpts(is_show=False))
+    .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}"))
+    .render("pie_type.html")
+)
+

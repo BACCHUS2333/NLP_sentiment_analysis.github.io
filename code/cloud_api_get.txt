@@ -1,0 +1,26 @@
+#获取百度云的api链接接口，用于进行情感分析
+#输入access token和key
+import requests
+import json
+
+
+AK = 'z7Egc8UVu5iLyhGZHCjSplAZ'
+SK = '4xOpueRv9AQG5ju6YXBAoG9sOEeAKo5j'
+
+def main():
+        
+    url = "https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=z7Egc8UVu5iLyhGZHCjSplAZ&client_secret=4xOpueRv9AQG5ju6YXBAoG9sOEeAKo5j"    
+    #获取access_token    #获取用户信息    #获取用户名列表    #将用户名和角色列表发送到api接口    #打印用户名列表和角色列表    #打印用户名和角色列表到标准输出    #打印用户名和角色列表到用户界面    #打印用户名和角色列表到用户界面    #打印用户名和角色列表到标准输出    #打印
+    
+    payload = ""
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+    
+    response = requests.request("POST", url, headers=headers, data=payload)
+    
+    print(response.text)
+
+if __name__ == '__main__':
+    main()

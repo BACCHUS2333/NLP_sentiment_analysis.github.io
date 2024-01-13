@@ -1,0 +1,57 @@
+
+
+'''
+百度云分类的输出说明：
+confidence 表示置信度
+negative_prob 表示消极情感的概率
+positive_prob 表示积极情感的概率
+sentiment 表示情感判定（0是negative 1是neutral 2是positive）
+
+'''
+import urllib3
+import json
+import re
+
+
+access_token='24.c6c4fab649debbd292487c461404fda8.2592000.1687407710.282335-33884648'
+    
+http=urllib3.PoolManager()
+url='https://aip.baidubce.com/rpc/2.0/nlp/v1/sentiment_classify?access_token='+access_token
+
+
+import pandas as pd
+import numpy as np
+
+
+
+def sentiment_classify(text,url=url):
+  params = {'text':text}
+      
+  #进行json转换的时候，encode编码格式不指定也不会出错
+  encoded_data = json.dumps(params).encode('GBK')
+  request=http.request('POST', 
+                        url,
+                        body=encoded_data,
+                        headers={'Content-Type':'application/json'})
+  #对返回的byte字节进行处理。Python3输出位串，而不是可读的字符串，需要进行转换 
+  #注意编码格式
+  result = str(request.data,encoding='UTF-8')
+  result = json.loads(result)
+  #将字符串转换为数组或Dict格式
+#result是一个列表类型 或者 对象类型的元素的列表或元
+  result = result['items'][0]
+  print(text,result)
+  return result
+#  return result['item'][0]
+#print(result["items"][0]['confidence'])
+
+senti_count = pd.DataFrame(columns=["confidence","negative_prob","positive_prob","sentiment"])
+
+
+data = pd.read_csv("E:\python当学会\课程作业\homework_04_finale\Finale\data_storage\cleansed_data\\new_dataset_all.csv",usecols=['标题'])
+for title in data.values:
+    senti = sentiment_classify(str(title[0]))
+    senti_count.loc[len(senti_count.index)] = list(senti.values())
+
+senti_count.to_csv("E:\python当学会\课程作业\homework_04_finale\Finale\data_storage\cleansed_data\\senti_count.csv")
+    

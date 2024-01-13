@@ -1,0 +1,11 @@
+#存储返回的情感分析结果
+
+import pandas as pd
+import numpy as np
+import re
+
+senti_count = pd.DataFrame(columns=["confidence","negative_prob","positive_prob","sentiment"])
+
+dick ={"confidence":5,"negative_prob":10,"positive_prob":15,"sentiment":2}
+senti_count.loc[len(senti_count.index)] = list(dick.values())
+print(senti_count)

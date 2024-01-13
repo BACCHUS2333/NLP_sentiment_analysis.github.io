@@ -1,0 +1,63 @@
+#Dedicated to my dear fellow Jade,
+#2023/5/27 at WH hotel
+
+#cleanse the data and save as csv
+
+import os
+
+path = 'E:\python当学会\课程作业\homework_04_finale\Finale\data_storage\data_storage'
+file_list = []
+for file_name in os.listdir(path):
+    file_list.append("data_storage\\data_storage\\"+str(file_name))
+  # 将文件名列表加进列表中。
+
+
+import pandas as pd
+import numpy as np
+import re
+
+global new_dataset 	#global variable for the new dataframe
+
+new_dataset = pd.DataFrame(data=None,columns=['类别', '标题', '排名', '热度', '上榜时间', '链接', '爬取时间']) #create a dataframe object for the storage of cleansed data
+
+path_list = ["data_storage\\data_storage\\2023_05_27_01_42_36.csv","data_storage\\data_storage\\2023_05_27_07_42_38.csv","data_storage\\data_storage\\2023_05_27_13_42_41.csv","data_storage\\data_storage\\2023_05_27_19_42_43.csv","data_storage\\data_storage\\2023_05_28_00_42_45.csv","data_storage\\data_storage\\2023_05_28_06_42_48.csv",] #every 6 hour the path list of file
+
+
+def add_new_data_to_set(data1,new_dataset=new_dataset):
+    for news in data1.values:
+        if news[1] not in new_dataset["标题"]:
+            new_dataset.loc[len(new_dataset.index)] = list(news)
+            #添加新的数据到数据表中，列名称是title，数据是数据列表中的元素列表的一个元素
+
+    print(new_dataset.shape)
+    return new_dataset
+
+for path in file_list:
+    data  = pd.read_csv(path,index_col=0)
+    new_dataset = add_new_data_to_set(data1=data)
+#遍历每一个路径并添加
+
+new_dataset.drop_duplicates("标题",keep="first",inplace=True)
+#delete repeated values
+new_dataset.to_csv("data_storage\\data_storage\\new_dataset_all.csv")
+#save as csv.
+print(new_dataset.shape)
+'''
+
+def add_data_to_set(path,new_dataset=new_dataset):
+    data = pd.read_csv(path,index_col=0)
+    for i in data.values:
+    
+        if i[1] not in new_dataset['标题']:
+
+            new_dataset = new_dataset.append(pd.DataFrame([list(i)],columns=new_dataset.columns))
+    print(new_dataset.shape)
+    return new_dataset
+
+
+path_list = ["data_storage\\data_storage\\2023_05_27_01_42_36.csv","data_storage\\data_storage\\2023_05_27_09_42_39.csv"]
+for path in path_list:
+    add_data_to_set(path,)
+    
+new_dataset.to_csv("data_storage\\data_storage\\new_dataset.csv")
+'''
